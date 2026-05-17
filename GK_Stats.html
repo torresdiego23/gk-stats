@@ -964,6 +964,27 @@ function seedHistoricalData() {
   return toAdd.length;
 }
 
+const HISTORICAL_2026_FLORIDA = [
+  {id:1620000001,date:'2026-02-08',rival:'Canelones',myTeam:'Selección de Florida',type:'Torneo',goalsFor:1,goalsAgainst:0,result:'W',saves:null,shots:null,savesInBox:null,savesOutBox:null,penReceived:null,penSaved:null,rating:null,notes:''},
+  {id:1620000002,date:'2026-02-22',rival:'Casupá',myTeam:'Selección de Florida',type:'Torneo',goalsFor:2,goalsAgainst:1,result:'W',saves:null,shots:null,savesInBox:null,savesOutBox:null,penReceived:null,penSaved:null,rating:null,notes:''},
+  {id:1620000003,date:'2026-03-08',rival:'Canelones',myTeam:'Selección de Florida',type:'Torneo',goalsFor:1,goalsAgainst:0,result:'W',saves:null,shots:null,savesInBox:null,savesOutBox:null,penReceived:null,penSaved:null,rating:null,notes:''},
+  {id:1620000004,date:'2026-03-22',rival:'San Gregorio',myTeam:'Selección de Florida',type:'Torneo',goalsFor:3,goalsAgainst:2,result:'W',saves:null,shots:null,savesInBox:null,savesOutBox:null,penReceived:null,penSaved:null,rating:null,notes:''},
+  {id:1620000005,date:'2026-04-05',rival:'San Gregorio',myTeam:'Selección de Florida',type:'Torneo',goalsFor:3,goalsAgainst:1,result:'W',saves:null,shots:null,savesInBox:null,savesOutBox:null,penReceived:null,penSaved:null,rating:null,notes:''},
+  {id:1620000006,date:'2026-04-19',rival:'Durazno',myTeam:'Selección de Florida',type:'Torneo',goalsFor:0,goalsAgainst:3,result:'L',saves:null,shots:null,savesInBox:null,savesOutBox:null,penReceived:null,penSaved:null,rating:null,notes:''},
+  {id:1620000007,date:'2026-05-03',rival:'Durazno',myTeam:'Selección de Florida',type:'Torneo',goalsFor:2,goalsAgainst:0,result:'W',saves:null,shots:null,savesInBox:null,savesOutBox:null,penReceived:null,penSaved:null,rating:null,notes:''},
+];
+
+function seedHistorical2026Florida() {
+  const K = 'gk_seeded_2026_florida';
+  if (localStorage.getItem(K)) return 0;
+  const existing = getMatches();
+  const existingIds = new Set(existing.map(m => m.id));
+  const toAdd = HISTORICAL_2026_FLORIDA.filter(m => !existingIds.has(m.id));
+  saveMatches([...existing, ...toAdd]);
+  localStorage.setItem(K, '1');
+  return toAdd.length;
+}
+
 function seedHistorical2024() {
   const KEY2024 = 'gk_seeded_2024_lavalleja_fc';
   if (localStorage.getItem(KEY2024)) return 0;
@@ -1502,53 +1523,4 @@ function exportData() {
 }
 
 function showImport() {
-  document.getElementById('importPanel').style.display = 'block';
-  document.getElementById('exportResult').style.display = 'none';
-}
-
-function importData() {
-  const raw = document.getElementById('importText').value.trim();
-  if (!raw) { toast('⚠️ Pegá los datos primero'); return; }
-  try {
-    const parsed = JSON.parse(raw);
-    const incoming = Array.isArray(parsed) ? parsed : (parsed.matches || []);
-    if (!incoming.length) { toast('⚠️ No se encontraron partidos'); return; }
-    const existing = getMatches();
-    const existingIds = new Set(existing.map(m => m.id));
-    const newOnes = incoming.filter(m => !existingIds.has(m.id));
-    // Also update existing ones with imported data (in case they were edited)
-    const updated = existing.map(m => {
-      const imp = incoming.find(i => i.id === m.id);
-      return imp ? { ...m, ...imp } : m;
-    });
-    saveMatches([...updated, ...newOnes]);
-    refreshMeta(); renderDashboard();
-    closeSyncModal();
-    toast(`✅ ${newOnes.length} nuevos + ${incoming.length - newOnes.length} actualizados`);
-  } catch(e) {
-    toast('❌ Datos inválidos, verificá el texto');
-  }
-}
-
-// ══ INIT ══
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('editModal').addEventListener('click', e => { if (e.target === document.getElementById('editModal')) closeEdit(); });
-  document.getElementById('syncModal').addEventListener('click', e => { if (e.target === document.getElementById('syncModal')) closeSyncModal(); });
-  // One-time migration: clear all ratings
-  if (!localStorage.getItem('gk_rating_cleared_v1')) {
-    const cleared = getMatches().map(m => ({ ...m, rating: null }));
-    saveMatches(cleared);
-    localStorage.setItem('gk_rating_cleared_v1', '1');
-  }
-
-  const loaded2025 = seedHistoricalData();
-  const loaded2024 = seedHistorical2024();
-  const loaded = (loaded2025 || 0) + (loaded2024 || 0);
-  refreshMeta();
-  renderDashboard();
-  if (loaded) setTimeout(() => toast(`📥 ${loaded} partidos históricos cargados!`), 400);
-});
-</script>
-</body>
-</html>
+  document.getElementById('im
